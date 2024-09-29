@@ -30,7 +30,7 @@ const UpdateProductPage = () => {
         setName(product.NAME_PRODUCT);
         setDescription(product.DESCRIPTION_PRODUCT);
         setExpdate(product.EXPDATE_PRODUCT.split("T")[0]); // Fix date format
-        setPrice(product.PRICE_PRODUCT);
+        setPrice(product.PRICE_PRODUCT.toFixed(2)); // Ensure price is formatted as a float with 2 decimals
         setStock(product.STOCK_PRODUCT);
         setImage(product.IMAGE_PRODUCT); // Ensure this is a base64 string or URL
 
@@ -76,7 +76,7 @@ const UpdateProductPage = () => {
         name_product: name,
         description_product: description,
         expdate_product: expdate,
-        price_product: price,
+        price_product: parseFloat(price).toFixed(2), // Ensure price is a float with 2 decimal places
         stock_product: stock,
         image_product: image,
         categories: selectedCategories,
@@ -138,6 +138,8 @@ const UpdateProductPage = () => {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
+            min="0" // Prevent negative values
+            step="0.01" // Allow decimal values
           />
         </div>
         <div>
