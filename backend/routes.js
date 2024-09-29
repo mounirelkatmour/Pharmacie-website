@@ -698,13 +698,22 @@ router.put("/update-product/:id", (req, res) => {
     price_product,
     stock_product,
     image_product,
+    categories, // Get categories from the request body
   } = req.body;
 
-  const sql = `
+  // SQL query to update the product details
+  const updateProductSql = `
     UPDATE product
-    SET name_product = ?, description_product = ?, expdate_product = ?, price_product = ?, image_product = ?, stock_product = ?
+    SET 
+      name_product = ?, 
+      description_product = ?, 
+      expdate_product = ?, 
+      price_product = ?, 
+      image_product = ?, 
+      stock_product = ?
     WHERE id_product = ?`;
 
+  // Values to update
   const values = [
     name_product,
     description_product,
@@ -715,16 +724,65 @@ router.put("/update-product/:id", (req, res) => {
     productId,
   ];
 
-  db.query(sql, values, (err, result) => {
+  // Start a transaction to ensure data integrity
+  db.beginTransaction((err) => {
     if (err) {
-      console.error("Error updating product:", err);
-      return res.status(500).json({ error: "Error updating product" });
+      console.error("Error starting transaction:", err);
+      return res.status(500).json({ error: "Error starting transaction" });
     }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Product not found" });
-    }
-    return res.status(200).json({ message: "Product updated successfully" });
+
+    // Update the product details
+    db.query(updateProductSql, values, (err, result) => {
+      if (err) {
+        return db.rollback(() => {
+          console.error("Error updating product:", err);
+          return res.status(500).json({ error: "Error updating product" });
+        });
+      }
+      if (result.affectedRows === 0) {
+        return db.rollback(() => {
+          return res.status(404).json({ error: "Product not found" });
+        });
+      }
+
+      // Clear existing categories for the product
+      const deleteCategoriesSql = `DELETE FROM belong WHERE id_product = ?`;
+      db.query(deleteCategoriesSql, [productId], (err) => {
+        if (err) {
+          return db.rollback(() => {
+            console.error("Error deleting categories:", err);
+            return res.status(500).json({ error: "Error deleting categories" });
+          });
+        }
+
+        // Insert new categories
+        const insertCategoriesSql = `INSERT INTO belong (id_product, id_category) VALUES ?`;
+        const categoryValues = categories.map(categoryId => [productId, categoryId]);
+
+        db.query(insertCategoriesSql, [categoryValues], (err) => {
+          if (err) {
+            return db.rollback(() => {
+              console.error("Error inserting new categories:", err);
+              return res.status(500).json({ error: "Error inserting new categories" });
+            });
+          }
+
+          // Commit the transaction if all queries are successful
+          db.commit((err) => {
+            if (err) {
+              return db.rollback(() => {
+                console.error("Error committing transaction:", err);
+                return res.status(500).json({ error: "Error committing transaction" });
+              });
+            }
+
+            return res.status(200).json({ message: "Product updated successfully" });
+          });
+        });
+      });
+    });
   });
 });
+
 
 module.exports = router;

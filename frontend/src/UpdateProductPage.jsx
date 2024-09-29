@@ -82,7 +82,7 @@ const UpdateProductPage = () => {
         categories: selectedCategories,
       });
       alert(response.data.message);
-      navigate("/products"); // Redirect to products page after update
+      navigate("/display-products"); // Redirect to products page after update
     } catch (error) {
       console.error("Error updating the product!", error);
       alert("Error updating the product. Please try again.");

@@ -63,7 +63,7 @@ function DisplayProductsPage() {
       <Header />
       <NavBar />
       <div className="container">
-        <h1 id="display-products-title">Our Products</h1>
+        <h1 id="display-products-title">Products management section</h1>
         <div className="row">
           {products.length === 0 ? (
             <p>No products available</p>
