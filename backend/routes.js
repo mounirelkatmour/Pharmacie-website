@@ -650,5 +650,81 @@ router.get("/products-search", (req, res) => {
   });
 });
 
+// Delete product route
+router.delete("/products/:id", (req, res) => {
+  const id_product = req.params.id;
+
+  const sql = "DELETE FROM product WHERE id_product = ?";
+  db.query(sql, [id_product], (err, result) => {
+    if (err) {
+      console.error("Error deleting product:", err);
+      return res.status(500).json({ error: "Error deleting product" });
+    }
+    return res.status(200).json({ message: "Product deleted successfully" });
+  });
+});
+
+// Get product details by ID route
+router.get("/product/:id", (req, res) => {
+  const productId = req.params.id;
+  const sql = `
+    SELECT p.*, GROUP_CONCAT(c.id_category) AS categories
+    FROM product p
+    LEFT JOIN belong b ON p.id_product = b.id_product
+    LEFT JOIN category c ON b.id_category = c.id_category
+    WHERE p.id_product = ?
+    GROUP BY p.id_product
+  `;
+
+  db.query(sql, [productId], (err, data) => {
+    if (err) {
+      console.error("Error fetching product details:", err);
+      return res.status(500).json({ error: "Error fetching product details" });
+    }
+    if (data.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    return res.status(200).json(data[0]); // Return the first item (the product)
+  });
+});
+
+// Update product route
+router.put("/update-product/:id", (req, res) => {
+  const productId = req.params.id;
+  const {
+    name_product,
+    description_product,
+    expdate_product,
+    price_product,
+    stock_product,
+    image_product,
+  } = req.body;
+
+  const sql = `
+    UPDATE product
+    SET name_product = ?, description_product = ?, expdate_product = ?, price_product = ?, image_product = ?, stock_product = ?
+    WHERE id_product = ?`;
+
+  const values = [
+    name_product,
+    description_product,
+    expdate_product,
+    price_product,
+    Buffer.from(image_product, "base64"), // Assuming you're still using base64 for images
+    stock_product,
+    productId,
+  ];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error updating product:", err);
+      return res.status(500).json({ error: "Error updating product" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    return res.status(200).json({ message: "Product updated successfully" });
+  });
+});
 
 module.exports = router;

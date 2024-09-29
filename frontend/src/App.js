@@ -18,6 +18,8 @@ import BestSellers from './BestSellers';
 import NewProducts from './NewProducts';
 import Prescription from './Prescription';
 import SearchResults from './SearchResults';
+import DisplayProductsPage from './DisplayProductsPage';
+import UpdateProductPage from './UpdateProductPage';
 
 function App() {
   return (
@@ -25,6 +27,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/display-products" element={<DisplayProductsPage />} />
         <Route path="/medicines" element={<Medicines />} />
         <Route path="/prescriptions" element={<Prescription />} />
         <Route path="/supplements" element={<Supplements />} />
@@ -41,6 +44,7 @@ function App() {
         <Route path="/account" element={<PrivateRoute element={Account} />} />
         <Route path="/add-product" element={<AddProductPage />} />
         <Route path="/search" element={<SearchResults />} />
+        <Route path="/update-product/:id" element={<UpdateProductPage />} />
       </Routes>
     </Router>
   );
