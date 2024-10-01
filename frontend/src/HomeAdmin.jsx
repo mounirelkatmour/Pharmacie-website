@@ -23,6 +23,14 @@ function HomeAdmin() {
       <h1 id="admin-page-title">Admin Dashboard</h1>
 
       <button
+        id="user-interface-button"
+        className="admin-action-button btn btn-primary mb-3"
+        onClick={() => navigate("/account")}
+      >
+        User Interface
+      </button>
+
+      <button
         id="add-product-button"
         className="admin-action-button btn btn-primary mb-3"
         onClick={() => navigate("/add-product")}

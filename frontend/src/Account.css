@@ -49,7 +49,7 @@
   border-color: #009900;
 }
 
-#UserInfoContainer button {
+.account-logout-btn {
   width: 100%;
   display: block;
   margin: 30px auto 10px auto;
@@ -63,7 +63,7 @@
   font-size: 16px;
 }
 
-#UserInfoContainer button:hover {
+.account-logout-btn:hover {
   background-color: #990000;
 }
 
@@ -87,8 +87,26 @@
 .OrdersTable tr:nth-child(even) {
   background-color: #f2f2f2;
 }
-#UserInfoContainer h1,#OrdersContainer h1{
+#UserInfoContainer h1,
+#OrdersContainer h1 {
   margin: 0 0 20px 0;
   color: #009900;
   text-align: center;
+}
+.admin-dashboard-btn {
+  width: 100%;
+  display: block;
+  margin: 30px auto 10px auto;
+  background-color: #009900;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 16px;
+}
+
+.admin-dashboard-btn:hover {
+  background-color: darkgreen; /* Darker green on hover */
 }

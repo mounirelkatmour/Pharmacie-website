@@ -43,11 +43,9 @@ function Account() {
   // Function to format date and time as DD-MM-YYYY HH:MM:SS
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
-
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
     const year = date.getFullYear();
-
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const seconds = String(date.getSeconds()).padStart(2, "0");
@@ -80,7 +78,17 @@ function Account() {
                 <label>City:</label>
                 <input type="text" value={user.city} readOnly />
               </div>
-              <button onClick={handleLogout}>Log out</button>
+
+              {user.isAdmin === "True" && (
+                <button
+                  className="admin-dashboard-btn"
+                  onClick={() => navigate("/home-admin")}
+                >
+                  Admin Dashboard
+                </button>
+              )}
+
+              <button className="account-logout-btn" onClick={handleLogout}>Log out</button>
             </div>
 
             <div id="OrdersContainer">
