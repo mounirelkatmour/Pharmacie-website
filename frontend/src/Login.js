@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import Validation from "./LoginValidation.js";
 import axios from "axios";
 import Cookies from "js-cookie";
-// import backgroundImage from "./Components/Content/Images/img1.png";
 
 function Login() {
   const [values, setValues] = useState({ email: "", password: "" });
@@ -30,16 +29,19 @@ function Login() {
       axios
         .post("http://localhost:8081/login", values)
         .then((res) => {
-          console.log("Server response:", res.data); // Log the response to check the user object
-          if (res.data.message === "Success") {
-            const user = res.data.user; // Ensure `user` includes `id_user`
-            console.log("Parsed user data:", user); // Log the user object
+          console.log("Server response:", res.data);
+          if (res.data.message === "Admin login successful") {
+            // Redirect to admin home page
+            navigate("/home-admin");
+          } else if (res.data.message === "User login successful") {
+            const user = res.data.user;
+            console.log("Parsed user data:", user);
             if (rememberMe) {
               Cookies.set("user", JSON.stringify(user), { expires: 7 });
             } else {
               sessionStorage.setItem("user", JSON.stringify(user));
             }
-            navigate("/"); // Navigate to home page
+            navigate("/"); // Navigate to home page for user
           } else {
             alert("Email or password are incorrect");
           }
@@ -49,14 +51,22 @@ function Login() {
   };
 
   const handleClose = () => {
-    navigate("/"); // Navigate to home page
+    navigate("/");
   };
 
   return (
-    <div id="LoginPage" className="d-flex justify-content-center align-items-center vh-100">
+    <div
+      id="LoginPage"
+      className="d-flex justify-content-center align-items-center vh-100"
+    >
       <div id="BackgroundBlur" />
       <form onSubmit={handleSubmit} id="LoginForm">
-        <button type="button" className="btn-close" aria-label="Close" onClick={handleClose} />
+        <button
+          type="button"
+          className="btn-close"
+          aria-label="Close"
+          onClick={handleClose}
+        />
         <h1 id="LoginText" className="text-center mb-4">
           Log in
         </h1>

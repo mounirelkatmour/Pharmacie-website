@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Header from "./Components/Header/Header";
-import NavBar from "./Components/NavBar/NavBar";
-import Footer from "./Components/Footer/Footer";
 import axios from "axios";
 import "./DisplayProductsPage.css"; // Import the updated CSS
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -60,8 +57,6 @@ function DisplayProductsPage() {
 
   return (
     <div id="display-products-page">
-      <Header />
-      <NavBar />
       <div className="container">
         <h1 id="display-products-title">Products management section</h1>
         <div className="row">
@@ -104,7 +99,6 @@ function DisplayProductsPage() {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

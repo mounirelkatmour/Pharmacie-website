@@ -46,31 +46,53 @@ router.post("/signup", (req, res) => {
 
 // Login route
 router.post("/login", (req, res) => {
-  const sql =
-    "SELECT id_user, username_user, phone_user, city_user, email_user FROM user WHERE email_user = ? AND password_user = ?";
-  db.query(sql, [req.body.email, req.body.password], (err, data) => {
+  const { email, password } = req.body;
+
+  // Check if the email exists in the admin table
+  const adminSql = "SELECT id_admin, username_admin FROM admin WHERE email_admin = ? AND password_admin = ?";
+  db.query(adminSql, [email, password], (err, adminData) => {
     if (err) {
-      console.error("Error executing query:", err);
+      console.error("Error executing admin query:", err);
       return res.status(500).json({ error: "Error logging in" });
     }
-    if (data.length > 0) {
-      const { id_user, username_user, phone_user, city_user, email_user } =
-        data[0];
+    if (adminData.length > 0) {
+      // Email found in admin table
+      const { id_admin, username_admin } = adminData[0];
       return res.status(200).json({
-        message: "Success",
-        user: {
-          id: id_user,
-          username: username_user,
-          phone: phone_user,
-          city: city_user,
-          email: email_user,
+        message: "Admin login successful",
+        admin: {
+          id: id_admin,
+          username: username_admin,
         },
       });
-    } else {
-      return res.status(401).json({ message: "Fail" });
     }
+
+    // Check if the email exists in the user table
+    const userSql = "SELECT id_user, username_user, phone_user, city_user, email_user FROM user WHERE email_user = ? AND password_user = ?";
+    db.query(userSql, [email, password], (err, userData) => {
+      if (err) {
+        console.error("Error executing user query:", err);
+        return res.status(500).json({ error: "Error logging in" });
+      }
+      if (userData.length > 0) {
+        const { id_user, username_user, phone_user, city_user, email_user } = userData[0];
+        return res.status(200).json({
+          message: "User login successful",
+          user: {
+            id: id_user,
+            username: username_user,
+            phone: phone_user,
+            city: city_user,
+            email: email_user,
+          },
+        });
+      } else {
+        return res.status(401).json({ message: "Email or password are incorrect" });
+      }
+    });
   });
 });
+
 
 // Get products route
 router.get("/products", (req, res) => {
@@ -783,6 +805,88 @@ router.put("/update-product/:id", (req, res) => {
     });
   });
 });
+
+// get feedbacks
+router.get("/feedbacks", (req, res) => {
+  const sql = `
+    SELECT 
+      u.username_user, u.city_user, u.phone_user, f.text_feedback 
+    FROM 
+      feedback f 
+    JOIN 
+      user u 
+    ON 
+      f.id_user = u.id_user;
+  `;
+
+  db.query(sql, (err, data) => {
+    if (err) {
+      console.error("Error fetching feedbacks:", err);
+      return res.status(500).json({ error: "Error fetching feedbacks" });
+    }
+    res.status(200).json(data); // Send the feedback data to the frontend
+  });
+});
+
+// Get prescriptions route
+router.get("/prescriptions", (req, res) => {
+  const sql = `
+    SELECT p.id_prescription, 
+           p.image_prescription, 
+           p.description_prescription, 
+           u.username_user, 
+           u.city_user, 
+           u.phone_user
+    FROM prescription p
+    JOIN user u ON p.id_user = u.id_user`;
+
+  db.query(sql, (err, data) => {
+    if (err) {
+      console.error("Error fetching prescriptions:", err);
+      return res.status(500).json({ error: "Error fetching prescriptions" });
+    }
+
+    // Convert images to base64 for frontend usage
+    const prescriptionsWithImages = data.map(prescription => ({
+      ...prescription,
+      image_prescription: prescription.image_prescription ? prescription.image_prescription.toString('base64') : null
+    }));
+
+    return res.status(200).json(prescriptionsWithImages);
+  });
+});
+
+// GET ALL ORDERS
+router.get("/see-orders", (req, res) => {
+  const sqlOrders = `
+    SELECT o.ID_ORDER, o.ID_USER, o.PRICE_ORDER, o.DATE_ORDER, u.username_user
+    FROM ordering o
+    JOIN user u ON o.ID_USER = u.id_user
+  `;
+
+  db.query(sqlOrders, (err, results) => {
+    if (err) {
+      console.error("Error fetching orders:", err);
+      return res.status(500).json({ error: "Error fetching orders" });
+    }
+    res.status(200).json(results);
+  });
+});
+
+// GET ORDER DETAILS BY ID
+router.get("/order-details/:id", (req, res) => {
+  const orderId = req.params.id;
+
+  const sqlOrderDetails = "SELECT * FROM orderdetail WHERE ID_ORDER = ?";
+  db.query(sqlOrderDetails, [orderId], (err, orderDetails) => {
+    if (err) {
+      console.error("Error fetching order details:", err);
+      return res.status(500).json({ error: "Error fetching order details" });
+    }
+    res.status(200).json(orderDetails);
+  });
+});
+
 
 
 module.exports = router;

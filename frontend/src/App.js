@@ -20,12 +20,23 @@ import Prescription from './Prescription';
 import SearchResults from './SearchResults';
 import DisplayProductsPage from './DisplayProductsPage';
 import UpdateProductPage from './UpdateProductPage';
+import HomeAdmin from './HomeAdmin';
+import SeeFeedbacks from './SeeFeedbacks';
+import SeePrescriptions from './SeePrescriptions';
+import SeeOrders from './SeeOrders';
+import OrderDetails from './OrderDetails';
+
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/home-admin" element={<HomeAdmin />} />
+        <Route path="/see-feedbacks" element={<SeeFeedbacks />} />
+        <Route path="/see-prescriptions" element={<SeePrescriptions />} />
+        <Route path="/see-orders" element={<SeeOrders />} />
+        <Route path="/order-details/:id" element={<OrderDetails />} />
         <Route path="/products" element={<Products />} />
         <Route path="/display-products" element={<DisplayProductsPage />} />
         <Route path="/medicines" element={<Medicines />} />
