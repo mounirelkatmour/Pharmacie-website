@@ -48,51 +48,36 @@ router.post("/signup", (req, res) => {
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  // Check if the email exists in the admin table
-  const adminSql = "SELECT id_admin, username_admin FROM admin WHERE email_admin = ? AND password_admin = ?";
-  db.query(adminSql, [email, password], (err, adminData) => {
+  // Check if the email exists in the user table
+  const userSql = "SELECT id_user, username_user, phone_user, city_user, email_user, isAdmin FROM user WHERE email_user = ? AND password_user = ?";
+  db.query(userSql, [email, password], (err, userData) => {
     if (err) {
-      console.error("Error executing admin query:", err);
+      console.error("Error executing user query:", err);
       return res.status(500).json({ error: "Error logging in" });
     }
-    if (adminData.length > 0) {
-      // Email found in admin table
-      const { id_admin, username_admin } = adminData[0];
+
+    if (userData.length > 0) {
+      const { id_user, username_user, phone_user, city_user, email_user, isAdmin } = userData[0];
+      
+      // Ensure isAdmin is interpreted as a string
+      const adminStatus = isAdmin === "True" ? "True" : "False";
+
       return res.status(200).json({
-        message: "Admin login successful",
-        admin: {
-          id: id_admin,
-          username: username_admin,
+        message: "User login successful",
+        user: {
+          id: id_user,
+          username: username_user,
+          phone: phone_user,
+          city: city_user,
+          email: email_user,
+          isAdmin: adminStatus,  // Include isAdmin in the response as a string
         },
       });
+    } else {
+      return res.status(401).json({ message: "Email or password are incorrect" });
     }
-
-    // Check if the email exists in the user table
-    const userSql = "SELECT id_user, username_user, phone_user, city_user, email_user FROM user WHERE email_user = ? AND password_user = ?";
-    db.query(userSql, [email, password], (err, userData) => {
-      if (err) {
-        console.error("Error executing user query:", err);
-        return res.status(500).json({ error: "Error logging in" });
-      }
-      if (userData.length > 0) {
-        const { id_user, username_user, phone_user, city_user, email_user } = userData[0];
-        return res.status(200).json({
-          message: "User login successful",
-          user: {
-            id: id_user,
-            username: username_user,
-            phone: phone_user,
-            city: city_user,
-            email: email_user,
-          },
-        });
-      } else {
-        return res.status(401).json({ message: "Email or password are incorrect" });
-      }
-    });
   });
 });
-
 
 // Get products route
 router.get("/products", (req, res) => {

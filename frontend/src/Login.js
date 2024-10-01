@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Login.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,6 +12,15 @@ function Login() {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    const user = JSON.parse(
+      Cookies.get("user") || sessionStorage.getItem("user")
+    );
+    if (user) {
+      navigate(user.isAdmin === "True" ? "/home-admin" : "/account"); // Check if isAdmin is "True" string
+    }
+  }, [navigate]);
+
   const handleInput = (event) => {
     setValues((prev) => ({ ...prev, [event.target.name]: event.target.value }));
   };
@@ -24,24 +33,26 @@ function Login() {
     event.preventDefault();
     const validationErrors = Validation(values);
     setErrors(validationErrors);
-
+  
     if (!validationErrors.email && !validationErrors.password) {
       axios
         .post("http://localhost:8081/login", values)
         .then((res) => {
-          console.log("Server response:", res.data);
-          if (res.data.message === "Admin login successful") {
-            // Redirect to admin home page
-            navigate("/home-admin");
-          } else if (res.data.message === "User login successful") {
-            const user = res.data.user;
-            console.log("Parsed user data:", user);
+          const user = res.data.user;
+  
+          if (res.data.message === "User login successful") {
+            // Log the user information to the console
+            console.log("User Info:", user); // Add this line to log user information
+            
+            // Save user info in cookies or session storage
             if (rememberMe) {
               Cookies.set("user", JSON.stringify(user), { expires: 7 });
             } else {
               sessionStorage.setItem("user", JSON.stringify(user));
             }
-            navigate("/"); // Navigate to home page for user
+  
+            // Redirect based on isAdmin value being a string
+            navigate(user.isAdmin === "True" ? "/home-admin" : "/"); // Updated check for string
           } else {
             alert("Email or password are incorrect");
           }
@@ -49,6 +60,7 @@ function Login() {
         .catch((err) => console.log(err));
     }
   };
+  
 
   const handleClose = () => {
     navigate("/");
@@ -81,6 +93,7 @@ function Login() {
             id="emailInput"
             placeholder="Enter your email ..."
             onChange={handleInput}
+            required // Ensure the email field is required
           />
           {errors.email && <span className="text-danger">{errors.email}</span>}
         </div>
@@ -96,6 +109,7 @@ function Login() {
             id="passwordInput"
             placeholder="Enter your password ..."
             onChange={handleInput}
+            required // Ensure the password field is required
           />
           {errors.password && (
             <span className="text-danger">{errors.password}</span>
