@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2";
 import Header from "./Components/Header/Header";
 import NavBar from "./Components/NavBar/NavBar";
 import Footer from "./Components/Footer/Footer";
@@ -17,7 +18,7 @@ function Prescription() {
     const reader = new FileReader();
 
     reader.onloadend = () => {
-      setImage(reader.result.split(",")[1]); // Get base64 encoded string
+      setImage(reader.result.split(",")[1]);
     };
 
     if (file) {
@@ -27,39 +28,64 @@ function Prescription() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const user = Cookies.get("user") || sessionStorage.getItem("user");
+    
     if (!user) {
-        alert("You must be logged in to submit a prescription.");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
-        return;
-      }      
-
+      Swal.fire({
+        title: "Error",
+        text: "You must be logged in to submit a prescription.",
+        icon: "error",
+        confirmButtonColor: "#009900", // Match page theme
+      });
+  
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+      return;
+    }
+  
+    // Check if the prescription image is null
+    if (!image) {
+      Swal.fire({
+        title: "Error",
+        text: "Please upload a prescription image before submitting.",
+        icon: "error",
+        confirmButtonColor: "#009900", // Match page theme
+      });
+      return;
+    }
+  
     const userData = JSON.parse(user);
     const userId = userData.id;
-
+  
     try {
-      const response = await axios.post(
-        "http://localhost:8081/add-prescription",
-        {
-          id_user: userId,
-          image_prescription: image,
-          description_prescription: description,
-        }
-      );
-
+      const response = await axios.post("http://localhost:8081/add-prescription", {
+        id_user: userId,
+        image_prescription: image,
+        description_prescription: description,
+      });
+  
       if (response.status === 201) {
-        alert("Thank you for submitting your prescription, we will contact you soon !");
+        Swal.fire({
+          title: "Success!",
+          text: "Thank you for submitting your prescription, we will contact you soon!",
+          icon: "success",
+          confirmButtonColor: "#009900", // Match page theme
+        });
         setDescription("");
-        setImage(null);
+        setImage(null); // Reset the image after success
       }
     } catch (error) {
       console.error("Error submitting prescription:", error);
-      alert("There was an error submitting your prescription.");
+      Swal.fire({
+        title: "Error",
+        text: "There was an error submitting your prescription.",
+        icon: "error",
+        confirmButtonColor: "#009900", // Match page theme
+      });
     }
-  };
+  };  
 
   return (
     <div className="prescription-page">

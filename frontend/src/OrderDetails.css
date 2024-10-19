@@ -2,7 +2,7 @@
     margin: 20px;
     font-family: 'Outfit', sans-serif; /* Use your preferred font */
   }
-  
+
   #order-details-page-title{
     padding-top: 30px;
   }
@@ -10,7 +10,7 @@
   #order-details-title {
     margin-bottom: 30px;
     font-size: 2.5em;
-    color: #333;
+    color: #555;
     text-align: center;
   }
   
@@ -22,7 +22,8 @@
   }
   
   .order-detail-card {
-    background-color: #ffffff;
+    color: #555;
+    background-color: #f8f9fa;
     border: 1px solid #ccc;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./ProductModal.css";
-import Cookies from "js-cookie"; 
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -22,13 +23,39 @@ const ProductModal = ({ product, onClose }) => {
   }, [quantity, product.PRICE_PRODUCT]);
 
   const handleQuantityChange = (e) => {
-    setQuantity(parseInt(e.target.value, 10));
+    const value = e.target.value; // Get the input value as a string
+
+    // Allow empty input
+    if (value === "") {
+      setQuantity("");
+    } else {
+      const numberValue = parseInt(value, 10);
+
+      // Update the quantity only if it's within the range
+      if (numberValue >= 1 && numberValue <= product.STOCK_PRODUCT) {
+        setQuantity(numberValue);
+      } else if (numberValue > product.STOCK_PRODUCT) {
+        setQuantity(product.STOCK_PRODUCT); // Reset to max if overstock
+      } else if (numberValue < 1) {
+        setQuantity(1); // Reset to minimum if understock
+      }
+    }
   };
 
   const handleAddToCart = async () => {
     const user = Cookies.get("user") || sessionStorage.getItem("user");
     if (!user) {
-      navigate("/login");
+      Swal.fire({
+        title: "Error",
+        text: "You must be logged in to add a product to cart.",
+        icon: "error",
+        confirmButtonColor: "#009900", // Match page theme
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+      return;
     } else {
       try {
         const userData = JSON.parse(user);
@@ -43,14 +70,28 @@ const ProductModal = ({ product, onClose }) => {
         await axios.post("http://localhost:8081/add-to-cart", {
           id_product: product.ID_PRODUCT,
           id_user: userId,
-          quantity_product: quantity
+          quantity_product: quantity,
         });
 
-        alert("Product added to cart successfully!");
+        // Show success alert using SweetAlert2
+        Swal.fire({
+          title: "Success!",
+          text: "Product added to cart successfully!",
+          icon: "success",
+          confirmButtonColor: "#009900", // Match your page's theme
+        });
+
         onClose(); // Close the modal after adding to cart
       } catch (err) {
         console.error("Error adding product to cart:", err);
-        alert("Error adding product to cart.");
+
+        // Show error alert using SweetAlert2
+        Swal.fire({
+          title: "Error!",
+          text: "Error adding product to cart.",
+          icon: "error",
+          confirmButtonColor: "#009900", // Match your page's theme
+        });
       }
     }
   };
@@ -89,9 +130,7 @@ const ProductModal = ({ product, onClose }) => {
             <p className="modal-stock">
               Stock Quantity: {product.STOCK_PRODUCT}
             </p>
-            <p className="modal-price">
-              Price: {product.PRICE_PRODUCT} DH
-            </p>
+            <p className="modal-price">Price: {product.PRICE_PRODUCT} DH</p>
             <div className="quantity-container">
               <span className="quantity-label">Quantity</span>
               <input

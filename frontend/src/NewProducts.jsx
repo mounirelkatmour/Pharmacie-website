@@ -9,6 +9,7 @@ import ProductModal from "./Components/ProductModal/ProductModal.jsx"; // Import
 import LoadingSpinner from "./Components/LoadingSpinner/LoadingSpinner.jsx";
 import Cookies from "js-cookie"; // Assuming you're using js-cookie library
 import { useNavigate } from "react-router-dom"; // If you're using react-router-dom
+import Swal from "sweetalert2";
 
 function NewProducts() {
   const [products, setProducts] = useState([]);
@@ -20,7 +21,17 @@ function NewProducts() {
   const handleAddToCart = async (product) => {
     const user = Cookies.get("user") || sessionStorage.getItem("user");
     if (!user) {
-      navigate("/login");
+      Swal.fire({
+        title: "Error",
+        text: "You must be logged in to add a product to cart.",
+        icon: "error",
+        confirmButtonColor: "#009900", // Match page theme
+      });
+  
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+      return;
     } else {
       try {
         const userData = JSON.parse(user);
@@ -32,10 +43,23 @@ function NewProducts() {
           id_user: userId,
         });
 
-        alert("Product added to cart successfully!");
+        // Show success alert using SweetAlert2
+        Swal.fire({
+          title: "Success!",
+          text: "Product added to cart successfully!",
+          icon: "success",
+          confirmButtonColor: "#009900", // Match your green theme
+        });
       } catch (err) {
         console.error("Error adding product to cart:", err);
-        alert("Error adding product to cart.");
+
+        // Show error alert using SweetAlert2
+        Swal.fire({
+          title: "Error!",
+          text: "Error adding product to cart.",
+          icon: "error",
+          confirmButtonColor: "#009900", // Match your green theme
+        });
       }
     }
   };

@@ -11,7 +11,9 @@ function OrderDetails() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8081/order-details/${id}`);
+        const response = await axios.get(
+          `http://localhost:8081/order-details/${id}`
+        );
         setOrderDetails(response.data);
       } catch (error) {
         console.error("Error fetching order details:", error);
@@ -23,10 +25,11 @@ function OrderDetails() {
 
   return (
     <div id="order-details-page-container">
-      <h1 id="order-details-page-title">Order Details</h1>
+      <h1 id="order-details-page-title">Order N°{id} Details :</h1>
       <div className="order-details-list">
         {orderDetails.map((detail) => (
           <div key={detail.ID_ORDERDETAIL} className="order-detail-card">
+            <p className="product-name">Product Name: {detail.NAME_PRODUCT}</p>
             <p className="product-id">Product ID: {detail.ID_PRODUCT}</p>
             <p className="quantity">Quantity: {detail.QUANTITY_PRODUCT}</p>
             <p className="price">Price: {detail.PRICE}DH</p>

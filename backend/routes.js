@@ -862,7 +862,10 @@ router.get("/see-orders", (req, res) => {
 router.get("/order-details/:id", (req, res) => {
   const orderId = req.params.id;
 
-  const sqlOrderDetails = "SELECT * FROM orderdetail WHERE ID_ORDER = ?";
+  const sqlOrderDetails = `SELECT * FROM orderdetail
+    JOIN product 
+    ON orderdetail.ID_PRODUCT = product.ID_PRODUCT 
+    WHERE orderdetail.ID_ORDER = ?`;
   db.query(sqlOrderDetails, [orderId], (err, orderDetails) => {
     if (err) {
       console.error("Error fetching order details:", err);

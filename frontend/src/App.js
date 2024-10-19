@@ -26,6 +26,7 @@ import SeePrescriptions from './SeePrescriptions';
 import SeeOrders from './SeeOrders';
 import OrderDetails from './OrderDetails';
 import PrivateAdminRoute from './PrivateAdminRoute';
+import ProductPage from './Components/ProductPage/ProductPage';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
         <Route path="/new-products" element={<NewProducts />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/search" element={<SearchResults />} />
+        <Route path="/product/:id" element={<ProductPage />} />
 
         {/* Private Routes for Authenticated Users */}
         <Route path="/personal-info" element={<PrivateRoute element={Account} />} />

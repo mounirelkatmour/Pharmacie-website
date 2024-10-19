@@ -5,16 +5,28 @@ import Footer from "./Components/Footer/Footer";
 import axios from "axios"; // Import axios for making API requests
 import Cookies from "js-cookie"; // Assuming you're using cookies for user authentication
 import "./Contactus.css";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 function ContactUs() {
   const [feedback, setFeedback] = useState(""); // State to hold the feedback text
+  const navigate = useNavigate(); // Initialize navigate
 
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
 
     const user = Cookies.get("user") || sessionStorage.getItem("user");
     if (!user) {
-      alert("You must be logged in to submit feedback.");
+      Swal.fire({
+        title: "Error",
+        text: "You must be logged in to submit a Feedback.",
+        icon: "error",
+        confirmButtonColor: "#009900", // Match page theme
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
       return;
     }
 
