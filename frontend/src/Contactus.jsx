@@ -15,6 +15,17 @@ function ContactUs() {
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if feedback is empty
+    if (!feedback.trim()) {
+      Swal.fire({
+        title: "Error!",
+        text: "Please enter a message to submit your feedback.",
+        icon: "error",
+        confirmButtonColor: "#009900",
+      });
+      return; // Stop the function if feedback is empty
+    }
+
     const user = Cookies.get("user") || sessionStorage.getItem("user");
     if (!user) {
       Swal.fire({
@@ -43,12 +54,25 @@ function ContactUs() {
       );
 
       if (response.status === 201) {
-        alert("Feedback submitted successfully!");
+        Swal.fire({
+          title: "Success!",
+          text: "Feedback submitted successfully!",
+          icon: "success",
+          confirmButtonColor: "#009900",
+          backdrop: true,
+          timer: 3000,
+          timerProgressBar: true,
+        });
         setFeedback(""); // Clear the textarea
       }
     } catch (error) {
       console.error("Error submitting feedback:", error);
-      alert("There was an error submitting your feedback.");
+      Swal.fire({
+        title: "Error!",
+        text: "There was an error submitting your feedback.",
+        icon: "error",
+        confirmButtonColor: "#009900",
+      });
     }
   };
 
@@ -85,9 +109,9 @@ function ContactUs() {
             </div>
             <div className="contactus-section">
               <h2>Business Hours</h2>
-              <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-              <p>Saturday: 10:00 AM - 4:00 PM</p>
-              <p>Sunday: Closed</p>
+              <p>Monday - Friday : 8:00 AM - 6:00 PM</p>
+              <p>Saturday : 10:00 AM - 6:00 PM</p>
+              <p>Sunday : Closed</p>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ import NavBar from "./Components/NavBar/NavBar";
 import Footer from "./Components/Footer/Footer";
 import "./Cart.css";
 import LoadingSpinner from "./Components/LoadingSpinner/LoadingSpinner";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -70,9 +71,20 @@ function Cart() {
       );
       setCartItems(response.data);
       setModifiedQuantities({});
+      Swal.fire({
+        title: "Success!",
+        text: "Cart items updated successfully!",
+        icon: "success",
+        confirmButtonColor: "#009900",
+      });
     } catch (err) {
       console.error("Error updating cart items:", err);
-      alert("Error updating cart items.");
+      Swal.fire({
+        title: "Error!",
+        text: "Error updating cart items.",
+        icon: "error",
+        confirmButtonColor: "#009900",
+      });
     }
   };
 
@@ -92,9 +104,22 @@ function Cart() {
       });
 
       setCartItems(cartItems.filter((item) => item.id_product !== idProduct));
+      Swal.fire({
+        title: "Deleted!",
+        text: "Product has been removed from your cart.",
+        icon: "success",
+        confirmButtonColor: "#009900",
+        timer: 3000,
+        timerProgressBar: true,
+      });
     } catch (err) {
       console.error("Error deleting cart item:", err);
-      alert("Error deleting cart item.");
+      Swal.fire({
+        title: "Error!",
+        text: "Error deleting cart item.",
+        icon: "error",
+        confirmButtonColor: "#009900",
+      });
     }
   };
 
@@ -109,56 +134,63 @@ function Cart() {
 
   const handleOrder = async () => {
     try {
-        const user = Cookies.get("user") || sessionStorage.getItem("user");
-        if (!user) {
-            navigate("/login");
-            return;
-        }
+      const user = Cookies.get("user") || sessionStorage.getItem("user");
+      if (!user) {
+        navigate("/login");
+        return;
+      }
 
-        const userData = JSON.parse(user);
-        const userId = userData.id;
+      const userData = JSON.parse(user);
+      const userId = userData.id;
 
-        // Create order data with products
-        const orderData = {
-            id_user: userId,
-            price_order: totalPrice, // Ensure this is the correct field name
-            date_order: new Date().toISOString().slice(0, 19).replace('T', ' '), // Format to YYYY-MM-DD HH:MM:SS
-            products: cartItems.map(item => ({
-                id_product: item.id_product,
-                quantity: modifiedQuantities[item.id_product] || item.quantity,
-            })),
-        };
+      // Create order data with products
+      const orderData = {
+        id_user: userId,
+        price_order: totalPrice,
+        date_order: new Date().toISOString().slice(0, 19).replace("T", " "),
+        products: cartItems.map((item) => ({
+          id_product: item.id_product,
+          quantity: modifiedQuantities[item.id_product] || item.quantity,
+        })),
+      };
 
-        // Create a new order
-        const orderResponse = await axios.post("http://localhost:8081/orders", orderData);
-        const orderId = orderResponse.data.orderId;
+      // Create a new order
+      const orderResponse = await axios.post("http://localhost:8081/orders", orderData);
+      const orderId = orderResponse.data.orderId;
 
-        // Create order details
-        const orderDetails = cartItems.map((item) => ({
-            id_product: item.id_product,
-            quantity_product: modifiedQuantities[item.id_product] || item.quantity,
-            price_product: (modifiedQuantities[item.id_product] || item.quantity) * item.price_product,
-        }));
+      // Create order details
+      const orderDetails = cartItems.map((item) => ({
+        id_product: item.id_product,
+        quantity_product: modifiedQuantities[item.id_product] || item.quantity,
+        price_product: (modifiedQuantities[item.id_product] || item.quantity) * item.price_product,
+      }));
 
-        await axios.post("http://localhost:8081/order-details", {
-            id_order: orderId,
-            orderDetails: orderDetails,
-        });
+      await axios.post("http://localhost:8081/order-details", {
+        id_order: orderId,
+        orderDetails: orderDetails,
+      });
 
-        // Clear the cart
-        await axios.delete(`http://localhost:8081/clear-cart/${userId}`);
-        setCartItems([]);
-        alert("Order placed successfully");
-        navigate("/");
+      // Clear the cart
+      await axios.delete(`http://localhost:8081/clear-cart/${userId}`);
+      setCartItems([]);
+      Swal.fire({
+        title: "Order Placed!",
+        text: "Your order has been placed successfully.",
+        icon: "success",
+        confirmButtonColor: "#009900",
+      });
+      navigate("/");
     } catch (err) {
-        console.error("Error placing order:", err.response ? err.response.data : err.message);
-        alert("Error placing order.");
+      console.error("Error placing order:", err.response ? err.response.data : err.message);
+      Swal.fire({
+        title: "Error!",
+        text: "Error placing order.",
+        icon: "error",
+        confirmButtonColor: "#009900",
+      });
     }
-};
+  };
 
-  
-  
-  
   return (
     <div className="cart-page">
       <Header />

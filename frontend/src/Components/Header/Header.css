@@ -196,3 +196,10 @@ body {
     font-size: 12px;
   }
 }
+.loading-indicator {
+  position: absolute;
+  right: 0;
+  padding: 0 50px 0 0;
+  color: #007bff; /* Change this to match your theme */
+  font-weight: bold;
+}

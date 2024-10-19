@@ -67,21 +67,25 @@ function Header() {
           <i className="fa fa-search"></i>
         </button>
 
-        {/* Display Suggestions */}
-        {suggestions.length > 0 && (
-          <div className="suggestions">
-            {suggestions.map((suggestion) => (
-              <div
-                key={suggestion.ID_PRODUCT}
-                className="suggestion-item"
-                onClick={() => {
-                  navigate(`/product/${suggestion.ID_PRODUCT}`); // Navigate to the product page
-                }}
-              >
-                {suggestion.NAME_PRODUCT}
-              </div>
-            ))}
-          </div>
+        {/* Display Suggestions or Loading Indicator */}
+        {loading ? (
+          <div className="loading-indicator">Loading...</div> // You can replace this with a spinner if you have one
+        ) : (
+          suggestions.length > 0 && (
+            <div className="suggestions">
+              {suggestions.map((suggestion) => (
+                <div
+                  key={suggestion.ID_PRODUCT}
+                  className="suggestion-item"
+                  onClick={() => {
+                    navigate(`/product/${suggestion.ID_PRODUCT}`); // Navigate to the product page
+                  }}
+                >
+                  {suggestion.NAME_PRODUCT}
+                </div>
+              ))}
+            </div>
+          )
         )}
       </div>
 
